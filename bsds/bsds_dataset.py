@@ -167,21 +167,6 @@ class BSDSHEDAugDataset (object):
     root_path - the root path of the dataset
     """
 
-    AUG_SCALES = [
-        '', '_scale_0.5', '_scale_1.5'
-    ]
-
-    AUG_ROTS = [
-        '0.0', '22.5', '45.0', '67.5', '90.0', '112.5', '135.0', '157.5', '180.0', '202.5', '225.0', '247.5',
-        '270.0', '292.5', '315.0', '337.5'
-    ]
-
-    AUG_FLIPS = [
-        '1_0', '1_1'
-    ]
-
-    ALL_AUGS = [(s, r, f) for f in AUG_FLIPS for r in AUG_ROTS for s in AUG_SCALES]
-
     def __init__(self, bsds_dataset, root_path):
         """
         Constructor
@@ -189,6 +174,13 @@ class BSDSHEDAugDataset (object):
         :param bsds_dataset: the standard BSDS dataset
         :param root_path: the path to the root of the augmented dataset
         """
+        self.AUG_SCALES = ['', '_scale_0.5', '_scale_1.5']
+
+        self.AUG_ROTS = ['0.0', '22.5', '45.0', '67.5', '90.0', '112.5', '135.0', '157.5','180.0','202.5','225.0','247.5','270.0','292.5', '315.0', '337.5']
+
+        self.AUG_FLIPS = ['1_0', '1_1']
+        self.ALL_AUGS = [(s, r, f) for f in self.AUG_FLIPS for r in self.AUG_ROTS for s in self.AUG_SCALES]
+        
         self.bsds_dataset = bsds_dataset
         self.root_path = root_path
 

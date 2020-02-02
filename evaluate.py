@@ -3,7 +3,7 @@ import os, argparse, sys
 import tqdm
 import numpy as np
 from bsds.bsds_dataset import BSDSDataset
-from bsds import evaluate_boundaries
+from bsds import evaluate_boundaries, edges_nms
 from skimage.util import img_as_float
 from skimage.color import rgb2grey
 from skimage.io import imread
@@ -65,6 +65,9 @@ def load_pred(sample_name):
     pred = pred[:tgt_shape[0], :tgt_shape[1]]
     pred = np.pad(pred, [(0, tgt_shape[0]-pred.shape[0]), (0, tgt_shape[1]-pred.shape[1])], mode='constant')
     return pred
+
+#nms predictions and save in pred_path/test/
+edges_nms.nms_all_edges(pred_path,suffix_ext)
 
 sample_results, threshold_results, overall_result = evaluate_boundaries.pr_evaluation(
     thresholds, SAMPLE_NAMES, load_gt_boundaries, load_pred, progress=tqdm.tqdm

@@ -1,5 +1,5 @@
 import os
-
+import numpy
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from Cython.Build import cythonize
@@ -22,6 +22,11 @@ extensions = [
     Extension(
         'bsds.correspond_pixels',
         [os.path.join('bsds', 'correspond_pixels.pyx')],
+    ),
+    Extension(
+        'bsds.suppress',
+        [os.path.join('bsds','suppress.pyx')],
+        [numpy.get_include()],                            
     ),
 ]
 
