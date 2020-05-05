@@ -15,7 +15,7 @@ cdef inline float interp(double[:, ::1] I, int h, int w, float x, float y) nogil
     cdef int x0=int(x), y0=int(y), x1=x0+1, y1=y0+1
     cdef float dx0=x-x0, dy0=y-y0, dx1=1-dx0, dy1=1-dy0
     
-    return I[y0,x0]*dx1*dy1 + I[y1,x0]*dx0*dy1 + I[y0,x1]*dx1*dy0 + I[y1,x1]*dx0*dy0
+    return I[y0,x0]*dx1*dy1 + I[y0,x1]*dx0*dy1 + I[y1,x0]*dx1*dy0 + I[y1,x1]*dx0*dy0
 
 ctypedef fused my_type:
     int
