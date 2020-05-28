@@ -3,8 +3,12 @@ import numpy as np
 from . import thin, correspond_pixels
 
 
-def evaluate_boundaries_bin(predicted_boundaries_bin, gt_boundaries,
-                            max_dist=0.0075, apply_thinning=True):
+def evaluate_boundaries_bin(
+    predicted_boundaries_bin,
+    gt_boundaries,
+    max_dist=0.0075,
+    apply_thinning=True
+):
     """
     Evaluate the accuracy of a predicted boundary.
 
@@ -53,9 +57,14 @@ def evaluate_boundaries_bin(predicted_boundaries_bin, gt_boundaries,
     return count_r, sum_r, count_p, sum_p
 
 
-def evaluate_boundaries(predicted_boundaries, gt_boundaries,
-                        thresholds=99, max_dist=0.0075, apply_thinning=True,
-                        progress=None):
+def evaluate_boundaries(
+    predicted_boundaries,
+    gt_boundaries,
+    thresholds=99,
+    max_dist=0.0075,
+    apply_thinning=True,
+    progress=None
+):
     """
     Evaluate the accuracy of a predicted boundary and a range of thresholds
 
@@ -89,16 +98,21 @@ def evaluate_boundaries(predicted_boundaries, gt_boundaries,
 
     # Handle thresholds
     if isinstance(thresholds, int):
-        thresholds = np.linspace(1.0 / (thresholds + 1),
-                                 1.0 - 1.0 / (thresholds + 1), thresholds)
+        thresholds = np.linspace(
+            1.0 / (thresholds + 1), 1.0 - 1.0 / (thresholds + 1), thresholds
+        )
     elif isinstance(thresholds, np.ndarray):
         if thresholds.ndim != 1:
-            raise ValueError('thresholds array should have 1 dimension, '
-                             'not {}'.format(thresholds.ndim))
+            raise ValueError(
+                'thresholds array should have 1 dimension, '
+                'not {}'.format(thresholds.ndim)
+            )
         pass
     else:
-        raise ValueError('thresholds should be an int or a NumPy array, not '
-                         'a {}'.format(type(thresholds)))
+        raise ValueError(
+            'thresholds should be an int or a NumPy array, not '
+            'a {}'.format(type(thresholds))
+        )
 
     sum_p = np.zeros(thresholds.shape)
     count_p = np.zeros(thresholds.shape)
@@ -112,7 +126,8 @@ def evaluate_boundaries(predicted_boundaries, gt_boundaries,
 
         if apply_thinning:
             predicted_boundaries_bin = thin.binary_thin(
-                predicted_boundaries_bin)
+                predicted_boundaries_bin
+            )
 
         for gt in gt_boundaries:
 
@@ -134,7 +149,6 @@ def evaluate_boundaries(predicted_boundaries, gt_boundaries,
     return count_r, sum_r, count_p, sum_p, thresholds
 
 
-
 def compute_rec_prec_f1(count_r, sum_r, count_p, sum_p):
     """
     Computer recall, precision and F1-score given `count_r`, `sum_r`,
@@ -147,22 +161,33 @@ def compute_rec_prec_f1(count_r, sum_r, count_p, sum_p):
     """
     rec = count_r / (sum_r + (sum_r == 0))
     prec = count_p / (sum_p + (sum_p == 0))
-    f1_denom = (prec + rec + ((prec+rec) == 0))
+    f1_denom = (prec + rec + ((prec + rec) == 0))
     f1 = 2.0 * prec * rec / f1_denom
     return rec, prec, f1
 
 
-SampleResult = namedtuple('SampleResult', ['sample_name', 'threshold',
-                                           'recall', 'precision', 'f1'])
-ThresholdResult = namedtuple('ThresholdResult', ['threshold', 'recall',
-                                                 'precision', 'f1'])
-OverallResult = namedtuple('OverallResult', ['threshold', 'recall',
-                                             'precision', 'f1',
-                                             'best_recall', 'best_precision',
-                                             'best_f1', 'area_pr'])
+SampleResult = namedtuple(
+    'SampleResult', ['sample_name', 'threshold', 'recall', 'precision', 'f1']
+)
+ThresholdResult = namedtuple(
+    'ThresholdResult', ['threshold', 'recall', 'precision', 'f1']
+)
+OverallResult = namedtuple(
+    'OverallResult', [
+        'threshold', 'recall', 'precision', 'f1', 'best_recall',
+        'best_precision', 'best_f1', 'area_pr'
+    ]
+)
 
-def pr_evaluation(thresholds, sample_names, load_gt_boundaries, load_pred,
-                  progress=None):
+
+def pr_evaluation(
+    thresholds,
+    sample_names,
+    load_gt_boundaries,
+    load_pred,
+    max_dist=0.0075,
+    progress=None
+):
     """
     Perform an evaluation of predictions against ground truths for an image
     set over a given set of thresholds.
@@ -223,10 +248,10 @@ def pr_evaluation(thresholds, sample_names, load_gt_boundaries, load_pred,
     else:
         n_thresh = thresholds.shape[0]
 
-    count_r_overall = np.zeros((n_thresh,))
-    sum_r_overall = np.zeros((n_thresh,))
-    count_p_overall = np.zeros((n_thresh,))
-    sum_p_overall = np.zeros((n_thresh,))
+    count_r_overall = np.zeros((n_thresh, ))
+    sum_r_overall = np.zeros((n_thresh, ))
+    count_p_overall = np.zeros((n_thresh, ))
+    sum_p_overall = np.zeros((n_thresh, ))
 
     count_r_best = 0
     sum_r_best = 0
@@ -243,7 +268,7 @@ def pr_evaluation(thresholds, sample_names, load_gt_boundaries, load_pred,
 
         # Evaluate predictions
         count_r, sum_r, count_p, sum_p, used_thresholds = \
-            evaluate_boundaries(pred, gt_b, thresholds=thresholds,
+            evaluate_boundaries(pred, gt_b, thresholds=thresholds, max_dist=max_dist,
                                 apply_thinning=True)
 
         count_r_overall += count_r
@@ -262,31 +287,36 @@ def pr_evaluation(thresholds, sample_names, load_gt_boundaries, load_pred,
         count_p_best += count_p[best_ndx]
         sum_p_best += sum_p[best_ndx]
 
-        sample_results.append(SampleResult(sample_name,
-                                           used_thresholds[best_ndx],
-                                           rec[best_ndx], prec[best_ndx],
-                                           f1[best_ndx]))
+        sample_results.append(
+            SampleResult(
+                sample_name, used_thresholds[best_ndx], rec[best_ndx],
+                prec[best_ndx], f1[best_ndx]
+            )
+        )
 
     # Computer overall precision, recall and F1
     rec_overall, prec_overall, f1_overall = compute_rec_prec_f1(
-        count_r_overall, sum_r_overall, count_p_overall, sum_p_overall)
+        count_r_overall, sum_r_overall, count_p_overall, sum_p_overall
+    )
 
     # Find best F1 score
     best_i_ovr = np.argmax(f1_overall)
 
     threshold_results = []
     for thresh_i in range(n_thresh):
-        threshold_results.append(ThresholdResult(used_thresholds[thresh_i],
-                                                 rec_overall[thresh_i],
-                                                 prec_overall[thresh_i],
-                                                 f1_overall[thresh_i]))
-
+        threshold_results.append(
+            ThresholdResult(
+                used_thresholds[thresh_i], rec_overall[thresh_i],
+                prec_overall[thresh_i], f1_overall[thresh_i]
+            )
+        )
 
     rec_unique, rec_unique_ndx = np.unique(rec_overall, return_index=True)
     prec_unique = prec_overall[rec_unique_ndx]
     if rec_unique.shape[0] > 1:
-        prec_interp = np.interp(np.arange(0, 1, 0.01), rec_unique,
-                                prec_unique, left=0.0, right=0.0)
+        prec_interp = np.interp(
+            np.arange(0, 1, 0.01), rec_unique, prec_unique, left=0.0, right=0.0
+        )
         area_pr = prec_interp.sum() * 0.01
     else:
         area_pr = 0.0
@@ -296,10 +326,10 @@ def pr_evaluation(thresholds, sample_names, load_gt_boundaries, load_pred,
         float(sum_p_best)
     )
 
-    overall_result = OverallResult(used_thresholds[best_i_ovr],
-                                   rec_overall[best_i_ovr],
-                                   prec_overall[best_i_ovr],
-                                   f1_overall[best_i_ovr], rec_best,
-                                   prec_best, f1_best, area_pr)
+    overall_result = OverallResult(
+        used_thresholds[best_i_ovr], rec_overall[best_i_ovr],
+        prec_overall[best_i_ovr], f1_overall[best_i_ovr], rec_best, prec_best,
+        f1_best, area_pr
+    )
 
     return sample_results, threshold_results, overall_result
